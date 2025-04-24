@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Layanan Bantu</title>
+  <style>
+    :root {
+      --primary-bg: #0f172a;
+      --secondary-bg: #1e293b;
+      --card-bg: #1a1f2e;
+      --accent-blue: #1e40af;
+      --accent-green: #14532d;
+      --text-color: #f1f5f9;
+      --muted-text: #94a3b8;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: var(--primary-bg);
+      color: var(--text-color);
+      transition: 0.3s ease;
+    }
+
+    header {
+      background-color: var(--accent-blue);
+      color: #fff;
+      padding: 25px 15px;
+      text-align: center;
+    }
+
+    section {
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .card {
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      background-color: var(--card-bg);
+      color: var(--text-color);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      opacity: 0;
+      transform: translateY(20px);
+      animation: slideIn 0.5s forwards;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.4s; }
+    .card:nth-child(4) { animation-delay: 0.6s; }
+    .card:nth-child(5) { animation-delay: 0.8s; }
+    .card:nth-child(6) { animation-delay: 1s; }
+    .card:nth-child(7) { animation-delay: 1.2s; }
+
+    @keyframes slideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .wa-button {
+      display: block;
+      background-color: #0f766e;
+      color: white;
+      text-align: center;
+      padding: 14px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: bold;
+      margin: 20px auto;
+      max-width: 320px;
+      transition: 0.3s;
+    }
+
+    .wa-button:hover {
+      background-color: #115e59;
+      transform: scale(1.05);
+    }
+
+    .form-box {
+      background-color: var(--secondary-bg);
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      margin-bottom: 15px;
+      background-color: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 6px;
+      color: var(--text-color);
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: var(--accent-blue);
+    }
+
+    button {
+      background-color: var(--accent-green);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background-color: #166534;
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      background: #0f172a;
+      color: var(--muted-text);
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Chat Parel</h1>
+    <p>Solusi Cerdas untuk Tugas, Proyek, dan Eksperimenmu</p>
+  </header>
+
+  <section>
+    <a href="https://wa.me/6282145545119" target="_blank" class="wa-button">Chat WhatsApp Sekarang</a>
+
+    <div class="card">
+      <h3>Tugas Pemrograman</h3>
+      <p>Bantu tugas C++, Java, HTML, dan lainnya. Cocok untuk pelajar & mahasiswa.</p>
+    </div>
+
+    <div class="card">
+      <h3>Robotika & Mikrokontroler</h3>
+      <p>Proyek robotik dari sensor sampai sistem kendali, Arduino, ESP, dan lainnya.</p>
+    </div>
+
+    <div class="card">
+      <h3>Elektronika Dasar</h3>
+      <p>Belajar komponen, eksperimen rangkaian, sampai paham praktiknya.</p>
+    </div>
+
+    <div class="card">
+      <h3>IoT & Arduino</h3>
+      <p>Panduan proyek IoT, Arduino Uno, ESP32, sensor & aktuator, MQTT, Blynk, dsb.</p>
+    </div>
+
+    <div class="card">
+      <h3>Sewa Modul Mikrokontroler</h3>
+      <p>Arduino Uno, NodeMCU ESP8266/ESP32, sensor DHT, Ultrasonik, Relay, OLED, LoRa, dll.</p>
+    </div>
+
+    <div class="card">
+      <h3>Testimoni Klien</h3>
+      <p><strong>Bayu:</strong> "Penjelasannya enak & gampang mengerti deh"<br>
+         <strong>Diva:</strong> "Bisa konsultasi langsung, Murah buangett!"</p>
+    </div>
+
+    <div class="card">
+      <h3>Portofolio Proyek</h3>
+      <ul>
+        <li>Smart Trash Bin (Arduino + Ultrasonik)</li>
+        <li>Sistem Chat LoRa Jarak Jauh</li>
+        <li>Prototipe Kendali Lampu IoT</li>
+      </ul>
+    </div>
+
+<div class="form-box">
+  <h3>Form Pemesanan Cepat</h3>
+  <form onsubmit="kirimWA(event)">
+    <input type="text" id="nama" placeholder="Nama kamu" required />
+    <input type="text" id="wilayah" placeholder="Wilayah (contoh: Bali, Amlapura)" required />
+    <textarea id="keperluan" rows="4" placeholder="Tulis kebutuhanmu..." required></textarea>
+    <button type="submit">Kirim ke WhatsApp</button>
+  </form>
+</div>
+
+<script>
+  function kirimWA(event) {
+    event.preventDefault();
+    const nama = document.getElementById("nama").value.trim();
+    const wilayah = document.getElementById("wilayah").value.trim();
+    const keperluan = document.getElementById("keperluan").value.trim();
+
+    const pesan = `Halo, Saya ${nama} dari ${wilayah} ingin ${keperluan}`;
+const url = `https://wa.me/6282145545119?text=${encodeURIComponent(pesan)}`;
+window.location.href = url;
+  }
+</script>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Parel Projects | Powered by Otak dan Kopi</p>
+  </footer>
+</body>
+</html>
